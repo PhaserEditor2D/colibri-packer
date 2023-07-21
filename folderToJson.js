@@ -1,18 +1,20 @@
 import fs, { readFileSync, writeFileSync } from "fs";
 import path from "path";
-import { readJSON } from "./utils.js";
 
 export function folderToJson(args) {
 
-    const { folder_to_json } = args;
-
-    console.log(`Packing folder ${folder_to_json} to JSON`);
+    const { folder_to_json, out } = args;
 
     const data = {};
 
     packDir(data, folder_to_json);
 
-    writeFileSync(path.basename(folder_to_json) + ".json", JSON.stringify(data, undefined, 1));
+    const file = path.join(
+        path.dirname(folder_to_json),
+        path.basename(folder_to_json) + ".json");
+
+    console.log(`Out ${file}`);
+    writeFileSync(file, JSON.stringify(data, undefined, 1));
 }
 
 /**
@@ -21,8 +23,6 @@ export function folderToJson(args) {
  * @param {string} dirKey 
  */
 function packDir(data, dir, dirKey) {
-
-    console.log("process", dir, "dirKey", dirKey);
 
     const files = fs.readdirSync(dir)
 
@@ -38,7 +38,11 @@ function packDir(data, dir, dirKey) {
 
         } else {
 
-            data[fileKey] = readFileSync(fullname).toString();
+            console.log(`Store ${fileKey}`);
+
+            const content = readFileSync(fullname).toString();
+
+            data[fileKey] = file.endsWith(".json") ? JSON.parse(content) : content;
         }
     }
 }
