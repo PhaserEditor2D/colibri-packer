@@ -2,10 +2,14 @@
   "name": "colibri-packer",
   "version": "1.0.0",
   "description": "An utility for packing Colibri resources and products.",
-  "main": "index.js",
+  "main": "./dist/index.js",
+  "bin": {
+    "colibri-packer": "./dist/bin/cli.js"
+  },
   "type": "module",
   "scripts": {
-    "start": "node cli.js",
+    "start": "tsc -w",
+    "build": "rm -Rf ./dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -13,12 +17,12 @@
     "phaser-editor-2d",
     "packer"
   ],
-  "bin": "cli.js",
   "author": "Arian Fornaris",
   "license": "MIT",
   "devDependencies": {
     "@types/argparse": "^2.0.10",
-    "@types/node": "^20.4.2"
+    "@types/node": "^20.4.2",
+    "typescript": "^5.1.6"
   },
   "dependencies": {
     "argparse": "^2.0.1"

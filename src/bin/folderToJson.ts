@@ -1,11 +1,11 @@
 import fs, { readFileSync, writeFileSync } from "fs";
 import path from "path";
 
-export function folderToJson(args) {
+export function folderToJson(args: any) {
 
-    const { folder_to_json, out } = args;
+    const { folder_to_json } = args;
 
-    const data = {};
+    const data: any = {};
 
     packDir(data, folder_to_json);
 
@@ -22,7 +22,7 @@ export function folderToJson(args) {
  * @param {string} dir
  * @param {string} dirKey 
  */
-function packDir(data, dir, dirKey) {
+function packDir(data: any, dir: string, dirKey?: string) {
 
     const files = fs.readdirSync(dir)
 
