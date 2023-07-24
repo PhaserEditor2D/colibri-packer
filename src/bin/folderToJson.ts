@@ -14,6 +14,7 @@ export function folderToJson(args: any) {
         path.basename(folder_to_json) + ".json");
 
     console.log(`Out ${file}`);
+
     writeFileSync(file, JSON.stringify(data, undefined, 1));
 }
 
@@ -22,7 +23,7 @@ export function folderToJson(args: any) {
  * @param {string} dir
  * @param {string} dirKey 
  */
-function packDir(data: any, dir: string, dirKey?: string) {
+function packDir(data: any, dir: string, dirKey?: string,) {
 
     const files = fs.readdirSync(dir)
 
