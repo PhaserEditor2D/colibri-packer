@@ -1,6 +1,6 @@
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "fs";
 import { Product } from "../lib/Product.js";
-import { join } from "path";
+import { dirname, join } from "path";
 
 export function packProduct(args: any) {
 
@@ -13,7 +13,7 @@ export function packProduct(args: any) {
     rmSync(productPluginDir, { force: true });
 
     console.log("Start processing product");
-    
+
     const product = new Product(productDir);
 
     product.read();
@@ -40,6 +40,8 @@ export function packProduct(args: any) {
             product_all_js += readFileSync(scriptFile);
 
             rmSync(scriptFile);
+
+            rmEmptyParents(dirname(scriptFile));
         }
 
         for (const style of config.styles) {
@@ -53,6 +55,8 @@ export function packProduct(args: any) {
             product_all_css += readFileSync(styleFile);
 
             rmSync(styleFile);
+
+            rmEmptyParents(dirname(styleFile));
         }
 
         // removes the "scripts", "styles" fields from "plugin.json".
@@ -72,7 +76,7 @@ export function packProduct(args: any) {
     console.log("Creating 'plugins/product.all'`");
 
     mkdirSync(productPluginDir);
-    
+
     writeFileSync(join(productPluginDir, "plugin.json"), JSON.stringify({
         id: "product.all",
         scripts: ["product.all.js"],
@@ -82,4 +86,16 @@ export function packProduct(args: any) {
     writeFileSync(join(productPluginDir, "product.all.js"), product_all_js);
 
     writeFileSync(join(productPluginDir, "product.all.css"), product_all_css);
+}
+
+function rmEmptyParents(dir: string) {
+
+    const list = readdirSync(dir);
+
+    if (list.length === 0) {
+
+        rmSync(dir, { force: true, recursive: true });
+
+        rmEmptyParents(dirname(dir));
+    }
 }
