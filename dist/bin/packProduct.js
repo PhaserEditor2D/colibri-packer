@@ -1,6 +1,6 @@
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "fs";
+import { mkdirSync, readFileSync, readdirSync, rmSync, rmdirSync, statSync, writeFileSync } from "fs";
 import { Product } from "../lib/Product.js";
-import { dirname, join } from "path";
+import { join } from "path";
 export function packProduct(args) {
     const productDir = args.pack_product;
     const productPluginDir = join(productDir, "plugins", "product.all");
@@ -21,7 +21,6 @@ export function packProduct(args) {
             const scriptFile = join(pluginDir, script);
             product_all_js += readFileSync(scriptFile);
             rmSync(scriptFile);
-            rmEmptyParents(dirname(scriptFile));
         }
         for (const style of config.styles) {
             console.log(`Processing ${config.id}/${style}`);
@@ -29,14 +28,17 @@ export function packProduct(args) {
             const styleFile = join(pluginDir, style);
             product_all_css += readFileSync(styleFile);
             rmSync(styleFile);
-            rmEmptyParents(dirname(styleFile));
         }
         // removes the "scripts", "styles" fields from "plugin.json".
         const pluginFile = join(pluginDir, "plugin.json");
-        const pluginData = JSON.parse(readFileSync(pluginFile).toString());
-        pluginData.scripts = [];
-        pluginData.styles = [];
-        writeFileSync(pluginFile, JSON.stringify(pluginData, undefined, 4));
+        // removes pluginFile, we don't need it anymore,
+        // only the product.all/plugin.json file is needed.
+        rmSync(pluginFile);
+        // const pluginData = JSON.parse(readFileSync(pluginFile).toString());
+        // pluginData.scripts = [];
+        // pluginData.styles = [];
+        // writeFileSync(pluginFile, JSON.stringify(pluginData, undefined, 4));
+        removeEmptyFolder(pluginDir);
     }
     // create product.all files
     console.log("Creating 'plugins/product.all'`");
@@ -49,10 +51,37 @@ export function packProduct(args) {
     writeFileSync(join(productPluginDir, "product.all.js"), product_all_js);
     writeFileSync(join(productPluginDir, "product.all.css"), product_all_css);
 }
-function rmEmptyParents(dir) {
-    const list = readdirSync(dir);
-    if (list.length === 0) {
-        rmSync(dir, { force: true, recursive: true });
-        rmEmptyParents(dirname(dir));
+function removeEmptyFolder(dir) {
+    console.log("Checking for removal " + dir);
+    let removeDir = true;
+    const dirFiles = readdirSync(dir);
+    console.log(dirFiles);
+    for (const file of dirFiles) {
+        const filePath = join(dir, file);
+        if (file === ".DS_Store") {
+            console.log("Remove .DS_Store");
+            rmSync(filePath);
+            continue;
+        }
+        const stat = statSync(filePath);
+        console.log("stat " + filePath);
+        if (stat.isDirectory()) {
+            console.log("is dir");
+            if (!removeEmptyFolder(filePath)) {
+                removeDir = false;
+            }
+        }
+        else {
+            console.log("is file");
+            removeDir = false;
+        }
     }
+    if (removeDir) {
+        console.log(`Removing empty folder ${dir}`);
+        rmdirSync(dir);
+    }
+    else {
+        console.log("Skip removal of " + dir);
+    }
+    return removeDir;
 }
