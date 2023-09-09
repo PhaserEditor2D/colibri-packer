@@ -52,36 +52,27 @@ export function packProduct(args) {
     writeFileSync(join(productPluginDir, "product.all.css"), product_all_css);
 }
 function removeEmptyFolder(dir) {
-    console.log("Checking for removal " + dir);
     let removeDir = true;
     const dirFiles = readdirSync(dir);
     console.log(dirFiles);
     for (const file of dirFiles) {
         const filePath = join(dir, file);
         if (file === ".DS_Store") {
-            console.log("Remove .DS_Store");
             rmSync(filePath);
             continue;
         }
         const stat = statSync(filePath);
-        console.log("stat " + filePath);
         if (stat.isDirectory()) {
-            console.log("is dir");
             if (!removeEmptyFolder(filePath)) {
                 removeDir = false;
             }
         }
         else {
-            console.log("is file");
             removeDir = false;
         }
     }
     if (removeDir) {
-        console.log(`Removing empty folder ${dir}`);
         rmdirSync(dir);
-    }
-    else {
-        console.log("Skip removal of " + dir);
     }
     return removeDir;
 }
