@@ -54,7 +54,6 @@ export function packProduct(args) {
 function removeEmptyFolder(dir) {
     let removeDir = true;
     const dirFiles = readdirSync(dir);
-    console.log(dirFiles);
     for (const file of dirFiles) {
         const filePath = join(dir, file);
         if (file === ".DS_Store") {

@@ -93,8 +93,6 @@ function removeEmptyFolder(dir: string) {
 
     const dirFiles = readdirSync(dir);
 
-    console.log(dirFiles);
-
     for(const file of dirFiles) {
 
         const filePath = join(dir, file);
